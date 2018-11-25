@@ -1,4 +1,25 @@
-export function reducer(state, action) {
+import { Product } from '../product';
+import * as fromRoot from 'src/app/state/app.state'; // importing all, and defining the all
+// as(alias) -> fromRoot
+
+
+// defining the feature slice of state as an interface
+/* export interface ProductState {
+    showProductCode: boolean;
+    currentProduct: Product;
+    products: Product[];
+} */
+// ! since products module is lazy loaded module, define the inteface like this-
+export interface ApplicationState extends fromRoot.ApplicationState {
+    products: ProductState;
+}
+export interface ProductState {
+    showProductCode: boolean;
+    currentProduct: Product;
+    products: Product[];
+}
+
+export function reducer(state: ProductState, action): ProductState {
     // state -> is the stae from the Stores, and action -> is action to be processed which has payload and type
 
     /*

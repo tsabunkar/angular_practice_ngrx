@@ -1,3 +1,9 @@
+
+// defining the feature slice of state as an interface
+export interface UserState {
+    showUserName: boolean;
+}
+
 export function loginReducer(state, action) {
 
     switch (action.type) { // checking the type prooperty from action object
