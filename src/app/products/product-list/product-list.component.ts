@@ -50,6 +50,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   // !backs to this Component
   checkChanged(value: boolean): void {
     // !dispatching the action
+    console.log(value);
     this.store.dispatch({
       type: 'TOGGLE_PRODUCT_CODE',
       payload: value

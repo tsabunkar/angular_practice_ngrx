@@ -17,7 +17,7 @@ const productRoutes: Routes = [
   imports: [
     SharedModule,
     RouterModule.forChild(productRoutes),
-    // StoreModule.forFeature('products', reducer) // defining the reducer as featue in the storeModule
+    StoreModule.forFeature('products', reducer) // defining the reducer as featue in the storeModule
   ],
   declarations: [
     ProductShellComponent,
