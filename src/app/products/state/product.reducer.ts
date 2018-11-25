@@ -1,5 +1,6 @@
 import { Product } from '../product';
 import * as fromRoot from 'src/app/state/app.state'; // importing all, and defining the all
+import { createFeatureSelector, createSelector } from '@ngrx/store';
 // as(alias) -> fromRoot
 
 
@@ -19,7 +20,28 @@ export interface ProductState {
     products: Product[];
 }
 
-export function reducer(state: ProductState, action): ProductState {
+const initialState: ProductState = {
+    showProductCode: true,
+    currentProduct: null,
+    products: []
+};
+
+
+// !building a selector
+const getProductFeatureSliceState = createFeatureSelector<ProductState>('products');
+// 'products' -> feauture slice of state from state tree
+
+export const getShowProductCodePropertyFromFeatureSliceOfStateObject = createSelector(
+    getProductFeatureSliceState, // *1st argum is feature slice of state i.e- 'products'
+    state => state.showProductCode // *2nd argum is the property which we want to retrieve from 'products' slice of state
+);
+
+export const getProductsPropertyFromFeatureSliceOfStateObject = createSelector(
+    getProductFeatureSliceState, // *1st argum is feature slice of state i.e- 'products'
+    state => state.products // *2nd argum is the property which we want to retrieve from 'products' slice of state
+);
+
+export function reducer(state: ProductState = initialState, action): ProductState {
     // state -> is the stae from the Stores, and action -> is action to be processed which has payload and type
 
     /*
@@ -39,3 +61,4 @@ export function reducer(state: ProductState, action): ProductState {
         }
     }
 }
+

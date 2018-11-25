@@ -2,9 +2,14 @@
 // defining the feature slice of state as an interface
 export interface UserState {
     showUserName: boolean;
+
 }
 
-export function loginReducer(state, action) {
+const initialState: UserState = {
+    showUserName: false
+};
+
+export function loginReducer(state = initialState, action): UserState {
 
     switch (action.type) { // checking the type prooperty from action object
         case 'MASK_USER_NAME': {

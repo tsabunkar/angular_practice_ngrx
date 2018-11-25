@@ -38,12 +38,18 @@ export class ProductListComponent implements OnInit, OnDestroy {
       (err: any) => this.errorMessage = err.error
     );
 
-    this.store.pipe(select('products')).subscribe(
-      products => {
-        if (products) {
-          this.displayCode = products['showProductCode']; // property of products slice of state.
-        }
-      }
+    /*  this.store.pipe(select('products')).subscribe(
+       products => {
+         // if (products) { // commenting this code- bcoz initialState is defined so we would never get undefined
+         this.displayCode = products['showProductCode']; // property of products slice of state.
+         // }
+       }
+     ); */
+
+    // ! Using the concept of SELECTORS to retrieve or fetch the property from slice of state
+
+    this.store.pipe(select(fromProduct.getShowProductCodePropertyFromFeatureSliceOfStateObject)).subscribe(
+      showProductCode => this.displayCode = showProductCode // property of products slice of state.
     );
   }
 
