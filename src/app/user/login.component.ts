@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { AuthService } from './auth.service';
+import { Store, select } from '@ngrx/store';
 
 @Component({
   templateUrl: './login.component.html',
@@ -15,10 +16,20 @@ export class LoginComponent implements OnInit {
   maskUserName: boolean;
 
   constructor(private authService: AuthService,
-              private router: Router) {
+    private router: Router,
+    private store: Store<any>) {
   }
 
   ngOnInit(): void {
+    this.store.pipe(select('login')).subscribe(
+      data => {
+        console.log(data);
+        if (data) {
+          this.maskUserName = data['showUserName'];
+        }
+
+      }
+    );
 
   }
 
@@ -26,9 +37,19 @@ export class LoginComponent implements OnInit {
     this.router.navigate(['welcome']);
   }
 
+  /*  checkChanged(value: boolean): void {
+     this.maskUserName = value;
+   } */
+
   checkChanged(value: boolean): void {
-    this.maskUserName = value;
+    const action = {
+      type: 'MASK_USER_NAME',
+      payload: value
+    };
+    this.store.dispatch(action);
+
   }
+
 
   login(loginForm: NgForm): void {
     if (loginForm && loginForm.valid) {
