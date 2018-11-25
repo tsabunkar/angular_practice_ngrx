@@ -18,6 +18,7 @@ const productRoutes: Routes = [
     SharedModule,
     RouterModule.forChild(productRoutes),
     StoreModule.forFeature('products', reducer) // defining the reducer as featue in the storeModule
+    // 'products' -> is slice of the state in the state tree
   ],
   declarations: [
     ProductShellComponent,
