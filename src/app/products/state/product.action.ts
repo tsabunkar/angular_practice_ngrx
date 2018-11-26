@@ -6,7 +6,10 @@ export enum ProductActionTypes {
     TOGGLE_PRODUCT_CODE = '[Product] Toggle the product code action type',
     SET_CURRENT_PRODUCT = '[Product] Set Current Product',
     CLEAR_CURRENT_PRODUCT = '[Product] Clear Current product action',
-    INITIALIZE_CURRENT_PRODUCT = '[Product] Initialize the current product action'
+    INITIALIZE_CURRENT_PRODUCT = '[Product] Initialize the current product action',
+    LOAD = '[Product] load/getAll list of products',
+    LOAD_SUCCESS = '[Product] list of products fetched sucessfully',
+    LOAD_FAIL = '[Product] failed to fetch the list of products'
 }
 
 // !another way of defining the constants
@@ -37,6 +40,19 @@ export class InitializeCurrentProductAction implements Action {
 
     // constructor() { } // not needed, empty constructor will written by default
 }
+export class LoadAction implements Action {
+    readonly type = ProductActionTypes.LOAD;
+}
+export class LoadSuccessAction implements Action {
+    readonly type = ProductActionTypes.LOAD_SUCCESS;
+
+    constructor(public payload: Product[]) { }
+}
+export class LoadFailureAction implements Action {
+    readonly type = ProductActionTypes.LOAD_FAIL;
+
+    constructor(public payload: string) { }
+}
 
 
 
@@ -44,6 +60,9 @@ export class InitializeCurrentProductAction implements Action {
 export type ProductActions = ToggleProductCodeAction
     | SetCurrentProductAction
     | ClearCurrentProductAction
-    | InitializeCurrentProductAction;
+    | InitializeCurrentProductAction
+    | LoadAction
+    | LoadFailureAction
+    | LoadSuccessAction;
 
 
