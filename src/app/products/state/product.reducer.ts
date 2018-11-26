@@ -37,7 +37,11 @@ export const getShowProductCodePropertyFromFeatureSliceOfStateObject = createSel
     state => state.showProductCode // *2nd argum is the property which we want to retrieve from 'products' slice of state
 );
 
-export const getProductsPropertyFromFeatureSliceOfStateObject = createSelector(
+export const getCurrentProductPropertyFromFeatureSliceOfStateObject = createSelector(
+    getProductFeatureSliceState, // *1st argum is feature slice of state i.e- 'products'
+    state => state.currentProduct // *2nd argum is the property which we want to retrieve from 'products' slice of state
+);
+export const getProductsArrayPropertyFromFeatureSliceOfStateObject = createSelector(
     getProductFeatureSliceState, // *1st argum is feature slice of state i.e- 'products'
     state => state.products // *2nd argum is the property which we want to retrieve from 'products' slice of state
 );

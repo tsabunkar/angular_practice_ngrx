@@ -1,4 +1,4 @@
-# APM-Demo0
+# APM-Practice Angular - NgRx (using Redux concepts)
 
 Starter files with no NgRx added.
 

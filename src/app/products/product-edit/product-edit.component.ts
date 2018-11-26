@@ -8,6 +8,10 @@ import { ProductService } from '../product.service';
 import { GenericValidator } from '../../shared/generic-validator';
 import { NumberValidators } from '../../shared/number.validator';
 
+// *NgRx
+import { Store, select } from '@ngrx/store';
+import * as  fromProduct from '../state/product.reducer';
+import * as productAction from './../state/product.action';
 @Component({
   selector: 'pm-product-edit',
   templateUrl: './product-edit.component.html',
@@ -27,7 +31,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   private genericValidator: GenericValidator;
 
   constructor(private fb: FormBuilder,
-    private productService: ProductService) {
+    private productService: ProductService,
+    private store: Store<fromProduct.ApplicationState>) {
 
     // Defines all of the validation messages for the form.
     // These could instead be retrieved from a file or database.
@@ -62,9 +67,14 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     });
 
     // Watch for changes to the currently selected product
-    this.sub = this.productService.selectedProductChanges$.subscribe(
-      selectedProduct => this.displayProduct(selectedProduct)
-    );
+    /*    this.sub = this.productService.selectedProductChanges$.subscribe(
+         selectedProduct => this.displayProduct(selectedProduct)
+       ); */
+    // !using NgRx concept
+    this.store.pipe(select(fromProduct.getCurrentProductPropertyFromFeatureSliceOfStateObject))
+      .subscribe(
+        currentProduct => this.displayProduct(currentProduct)
+      );
 
     // Watch for value changes
     this.productForm.valueChanges.subscribe(
@@ -73,7 +83,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    // this.sub.unsubscribe();
   }
 
   // Also validate on blur
@@ -113,21 +123,37 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.displayProduct(this.product);
   }
 
+  /*   deleteProduct(): void {
+      if (this.product && this.product.id) {
+        if (confirm(`Really delete the product: ${this.product.productName}?`)) {
+          this.productService.deleteProduct(this.product.id).subscribe(
+            () => this.productService.changeSelectedProduct(null),
+            (err: any) => this.errorMessage = err.error
+          );
+        }
+      } else {
+        // No need to delete, it was never saved
+        this.productService.changeSelectedProduct(null);
+      }
+    } */
+  // !using NgRx concept
   deleteProduct(): void {
     if (this.product && this.product.id) {
       if (confirm(`Really delete the product: ${this.product.productName}?`)) {
         this.productService.deleteProduct(this.product.id).subscribe(
-          () => this.productService.changeSelectedProduct(null),
+          () => this.store.dispatch(new productAction.ClearCurrentProductAction()),
           (err: any) => this.errorMessage = err.error
         );
       }
     } else {
       // No need to delete, it was never saved
-      this.productService.changeSelectedProduct(null);
+      this.store.dispatch(new productAction.ClearCurrentProductAction());
     }
   }
 
-  saveProduct(): void {
+
+
+  /* saveProduct(): void {
     if (this.productForm.valid) {
       if (this.productForm.dirty) {
         // Copy over all of the original product properties
@@ -143,6 +169,32 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         } else {
           this.productService.updateProduct(p).subscribe(
             product => this.productService.changeSelectedProduct(product),
+            (err: any) => this.errorMessage = err.error
+          );
+        }
+      }
+    } else {
+      this.errorMessage = 'Please correct the validation errors.';
+    }
+  } */
+
+  // !using NgRx concept
+  saveProduct(): void {
+    if (this.productForm.valid) {
+      if (this.productForm.dirty) {
+        // Copy over all of the original product properties
+        // Then copy over the values from the form
+        // This ensures values not on the form, such as the Id, are retained
+        const p = { ...this.product, ...this.productForm.value };
+
+        if (p.id === 0) {
+          this.productService.createProduct(p).subscribe(
+            product => this.store.dispatch(new productAction.SetCurrentProductAction(product)),
+            (err: any) => this.errorMessage = err.error
+          );
+        } else {
+          this.productService.updateProduct(p).subscribe(
+            product => this.store.dispatch(new productAction.SetCurrentProductAction(product)),
             (err: any) => this.errorMessage = err.error
           );
         }
