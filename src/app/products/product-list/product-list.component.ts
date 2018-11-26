@@ -1,3 +1,4 @@
+import * as productAction from './../state/product.action';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Subscription } from 'rxjs';
@@ -63,13 +64,19 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   // !replacing the above code to ngrx, ie we want to store the displayCode value when use navigatie
   // !backs to this Component
-  checkChanged(value: boolean): void {
+  /* checkChanged(value: boolean): void {
     // !dispatching the action
     console.log(value);
     this.store.dispatch({
       type: 'TOGGLE_PRODUCT_CODE',
       payload: value
     });
+  } */
+
+  // !USing action action creator while dispatching an action -
+  checkChanged(value: boolean): void {
+    // !dispatching the action
+    this.store.dispatch(new productAction.ToggleProductCodeAction(value));
   }
 
   newProduct(): void {
