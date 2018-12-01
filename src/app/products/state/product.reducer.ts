@@ -17,14 +17,15 @@ export interface ApplicationState extends fromRoot.ApplicationState {
 }
 export interface ProductState {
     showProductCode: boolean;
-    currentProduct: Product;
+    // currentProduct: Product;
+    currentProductId: number | null;
     products: Product[];
     error: string;
 }
 
 const initialState: ProductState = {
     showProductCode: true,
-    currentProduct: null,
+    currentProductId: null,
     products: [],
     error: ''
 };
@@ -39,10 +40,34 @@ export const getShowProductCodePropertyFromFeatureSliceOfStateObject = createSel
     state => state.showProductCode // *2nd argum is the property which we want to retrieve from 'products' slice of state
 );
 
-export const getCurrentProductPropertyFromFeatureSliceOfStateObject = createSelector(
+export const getCurrentProductIdPropertyFromFeatureSliceOfStateObject = createSelector(
+    getProductFeatureSliceState, // *1st argum is feature slice of state i.e- 'products'
+    state => state.currentProductId // *2nd argum is the property which we want to retrieve from 'products' slice of state
+);
+
+/* export const getCurrentProductPropertyFromFeatureSliceOfStateObject = createSelector(
     getProductFeatureSliceState, // *1st argum is feature slice of state i.e- 'products'
     state => state.currentProduct // *2nd argum is the property which we want to retrieve from 'products' slice of state
+); */
+export const getCurrentProductPropertyFromFeatureSliceOfStateObject = createSelector(
+    getProductFeatureSliceState,
+    getCurrentProductIdPropertyFromFeatureSliceOfStateObject,
+    (stateVal, currentProdId) => { // here -> stateVal = getProductFeatureSliceState
+        //   and currentProdId = getCurrentProductIdPropertyFromFeatureSliceOfStateObject
+        if (currentProdId === 0) {
+            return { // new product
+                id: 0,
+                productName: '',
+                productCode: 'New',
+                description: '',
+                starRating: 0
+            };
+        } else {
+            return currentProdId ? stateVal.products.find(p => p.id === currentProdId) : null;
+        }
+    }
 );
+
 export const getProductsArrayPropertyFromFeatureSliceOfStateObject = createSelector(
     getProductFeatureSliceState, // *1st argum is feature slice of state i.e- 'products'
     state => state.products // *2nd argum is the property which we want to retrieve from 'products' slice of state
@@ -89,31 +114,53 @@ export function reducer(state: ProductState = initialState, action: ProductActio
                 showProductCode: action.payload
             };
         }
+        /*   case ProductActionTypes.SET_CURRENT_PRODUCT: {
+              return {
+                  // return new class state
+                  ...state, // getting existing state copy (i.e- previous state)
+                  currentProduct: { ...action.payload }
+              };
+          }
+          case ProductActionTypes.CLEAR_CURRENT_PRODUCT: {
+              return {
+                  // return new class state
+                  ...state, // getting existing state copy (i.e- previous state)
+                  currentProduct: null
+              };
+          }
+          case ProductActionTypes.INITIALIZE_CURRENT_PRODUCT: {
+              return {
+                  // return new class state
+                  ...state, // getting existing state copy (i.e- previous state)
+                  currentProduct: {
+                      id: 0,
+                      productName: 'default product name',
+                      productCode: 'default code',
+                      description: 'default decription',
+                      starRating: 5
+                  }
+              };
+          } */
+        // removing currentProduct object, instead adding another property called productId ->
         case ProductActionTypes.SET_CURRENT_PRODUCT: {
             return {
                 // return new class state
                 ...state, // getting existing state copy (i.e- previous state)
-                currentProduct: { ...action.payload }
+                currentProductId: action.payload.id
             };
         }
         case ProductActionTypes.CLEAR_CURRENT_PRODUCT: {
             return {
                 // return new class state
                 ...state, // getting existing state copy (i.e- previous state)
-                currentProduct: null
+                currentProductId: null
             };
         }
         case ProductActionTypes.INITIALIZE_CURRENT_PRODUCT: {
             return {
                 // return new class state
                 ...state, // getting existing state copy (i.e- previous state)
-                currentProduct: {
-                    id: 0,
-                    productName: 'default product name',
-                    productCode: 'default code',
-                    description: 'default decription',
-                    starRating: 5
-                }
+                currentProductId: 0 // assigning productId to 0 , saying its new product
             };
         }
         case ProductActionTypes.LOAD_SUCCESS:
@@ -127,6 +174,23 @@ export function reducer(state: ProductState = initialState, action: ProductActio
             return {
                 ...state,
                 products: [], // if we have error then products array is empty
+                error: action.payload
+            };
+
+        case ProductActionTypes.UPDATE_PRODUCT_SUCCESS:
+            const updatedProducts = state.products.map( // using the map method, bcoz -create a new array not mutate the exisitng the array
+                productObject => action.payload.id === productObject.id ? action.payload : productObject
+            );
+            return {
+                ...state,
+                products: updatedProducts,
+                currentProductId: action.payload.id,
+                error: ''
+            };
+
+        case ProductActionTypes.UPDATE_PRODUCT_FAIL:
+            return {
+                ...state,
                 error: action.payload
             };
 

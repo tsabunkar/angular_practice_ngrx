@@ -117,7 +117,7 @@ export class ProductService {
 
 // !Instead using NgRX Effects
 export class ProductService {
-  private productsUrl = 'api/productsdss';
+  private productsUrl = 'api/products';
   // private products: Product[];
 
   private selectedProductSource = new BehaviorSubject<Product | null>(null);

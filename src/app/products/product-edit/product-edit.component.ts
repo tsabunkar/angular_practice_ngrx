@@ -179,6 +179,30 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   } */
 
   // !using NgRx concept
+  /*   saveProduct(): void {
+      if (this.productForm.valid) {
+        if (this.productForm.dirty) {
+          // Copy over all of the original product properties
+          // Then copy over the values from the form
+          // This ensures values not on the form, such as the Id, are retained
+          const p = { ...this.product, ...this.productForm.value };
+
+          if (p.id === 0) {
+            this.productService.createProduct(p).subscribe(
+              product => this.store.dispatch(new productAction.SetCurrentProductAction(product)),
+              (err: any) => this.errorMessage = err.error
+            );
+          } else {
+            this.productService.updateProduct(p).subscribe(
+              product => this.store.dispatch(new productAction.SetCurrentProductAction(product)),
+              (err: any) => this.errorMessage = err.error
+            );
+          }
+        }
+      } else {
+        this.errorMessage = 'Please correct the validation errors.';
+      }
+    } */
   saveProduct(): void {
     if (this.productForm.valid) {
       if (this.productForm.dirty) {
@@ -192,11 +216,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
             product => this.store.dispatch(new productAction.SetCurrentProductAction(product)),
             (err: any) => this.errorMessage = err.error
           );
-        } else {
-          this.productService.updateProduct(p).subscribe(
-            product => this.store.dispatch(new productAction.SetCurrentProductAction(product)),
-            (err: any) => this.errorMessage = err.error
-          );
+        } else { // for update using the concept of NgRx effects
+          this.store.dispatch(new productAction.UpdateProductAction(p));
         }
       }
     } else {

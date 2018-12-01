@@ -9,7 +9,10 @@ export enum ProductActionTypes {
     INITIALIZE_CURRENT_PRODUCT = '[Product] Initialize the current product action',
     LOAD = '[Product] load/getAll list of products',
     LOAD_SUCCESS = '[Product] list of products fetched sucessfully',
-    LOAD_FAIL = '[Product] failed to fetch the list of products'
+    LOAD_FAIL = '[Product] failed to fetch the list of products',
+    UPDATE_PRODUCT = '[Product] update the product',
+    UPDATE_PRODUCT_SUCCESS = '[Product] updated the product successfully',
+    UPDATE_PRODUCT_FAIL = '[Product] failed to update the product',
 }
 
 // !another way of defining the constants
@@ -53,6 +56,21 @@ export class LoadFailureAction implements Action {
 
     constructor(public payload: string) { }
 }
+export class UpdateProductAction implements Action {
+    readonly type = ProductActionTypes.UPDATE_PRODUCT;
+
+    constructor(public payload: Product) { }
+}
+export class UpdateProductSuccessAction implements Action {
+    readonly type = ProductActionTypes.UPDATE_PRODUCT_SUCCESS;
+
+    constructor(public payload: Product) { }
+}
+export class UpdateProductFailAction implements Action {
+    readonly type = ProductActionTypes.UPDATE_PRODUCT_FAIL;
+
+    constructor(public payload: string) { }
+}
 
 
 
@@ -63,6 +81,9 @@ export type ProductActions = ToggleProductCodeAction
     | InitializeCurrentProductAction
     | LoadAction
     | LoadFailureAction
-    | LoadSuccessAction;
+    | LoadSuccessAction
+    | UpdateProductAction
+    | UpdateProductSuccessAction
+    | UpdateProductFailAction;
 
 
