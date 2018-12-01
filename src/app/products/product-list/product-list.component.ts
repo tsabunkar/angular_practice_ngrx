@@ -1,7 +1,7 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -10,6 +10,7 @@ import { ProductService } from '../product.service';
 import { Store, select } from '@ngrx/store';
 import * as  fromProduct from '../state/product.reducer';
 import * as productAction from './../state/product.action';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'pm-product-list',
@@ -18,15 +19,19 @@ import * as productAction from './../state/product.action';
 })
 export class ProductListComponent implements OnInit, OnDestroy {
   pageTitle = 'Products';
-  errorMessage: string;
+  // errorMessage: string;
+  errorMessages$: Observable<string>;
 
   displayCode: boolean;
 
-  products: Product[];
+  // products: Product[];
 
   // Used to highlight the selected product in the list
   selectedProduct: Product | null;
   sub: Subscription;
+
+  // componentActive = true;
+  products$: Observable<Product[]>;
 
   constructor(
     private store: Store<fromProduct.ApplicationState>, // injecting store in the component
@@ -38,17 +43,45 @@ export class ProductListComponent implements OnInit, OnDestroy {
     ); */
     // !Above code we r subscribing for any event changed happend, this code we r replacing with
     // ! NgRx concept
-    this.store.pipe(select(fromProduct.getCurrentProductPropertyFromFeatureSliceOfStateObject))
+    this.store.pipe(
+      select(fromProduct.getCurrentProductPropertyFromFeatureSliceOfStateObject),
+    )
       .subscribe(
         currentProduct => this.selectedProduct = currentProduct
       );
 
 
 
-    this.productService.getProducts().subscribe(
-      (products: Product[]) => this.products = products,
-      (err: any) => this.errorMessage = err.error
-    );
+    /*  this.productService.getProducts().subscribe(
+       (products: Product[]) => this.products = products,
+       (err: any) => this.errorMessage = err.error
+     ); */
+
+    // !Using Effects
+    this.store.dispatch(new productAction.LoadAction()); // intialzing the LoadAction class
+
+    /*  this.store.pipe(select(fromProduct.getProductsArrayPropertyFromFeatureSliceOfStateObject))
+       .subscribe((products: Product[]) => this.products = products); */
+
+
+    // !Unsubscribing using takeWhile() operator
+    /* this.store.pipe(
+      select(fromProduct.getProductsArrayPropertyFromFeatureSliceOfStateObject),
+      takeWhile(() => this.componentActive) // unsubscribing
+    )
+      .subscribe((products: Product[]) => this.products = products); */
+
+
+    // !Unsubscribing using async pipe technique
+    // !Using async pipe and beautiful syntax in view -> <div class="card-body" *ngIf="products$ | async as products">
+    this.products$ = this.store.pipe(select(fromProduct.getProductsArrayPropertyFromFeatureSliceOfStateObject));
+    // .subscribe((products: Product[]) => this.products = products);
+
+
+
+
+    // * handling error -
+    this.errorMessages$ = this.store.pipe(select(fromProduct.getErrorPropertyFromFeatureSliceOfStateObject));
 
     /*  this.store.pipe(select('products')).subscribe(
        products => {
@@ -68,6 +101,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // this.sub.unsubscribe();
+
+    // !unsubscribing the effects
+    // this.componentActive = false;
   }
 
   /*   checkChanged(value: boolean): void {

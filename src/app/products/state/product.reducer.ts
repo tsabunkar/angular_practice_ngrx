@@ -19,12 +19,14 @@ export interface ProductState {
     showProductCode: boolean;
     currentProduct: Product;
     products: Product[];
+    error: string;
 }
 
 const initialState: ProductState = {
     showProductCode: true,
     currentProduct: null,
-    products: []
+    products: [],
+    error: ''
 };
 
 
@@ -45,6 +47,11 @@ export const getProductsArrayPropertyFromFeatureSliceOfStateObject = createSelec
     getProductFeatureSliceState, // *1st argum is feature slice of state i.e- 'products'
     state => state.products // *2nd argum is the property which we want to retrieve from 'products' slice of state
 );
+export const getErrorPropertyFromFeatureSliceOfStateObject = createSelector(
+    getProductFeatureSliceState,
+    state => state.error
+);
+
 /*
 export function reducer(state: ProductState = initialState, action): ProductState {
     // state -> is the stae from the Stores, and action -> is action to be processed which has payload and type
@@ -109,6 +116,19 @@ export function reducer(state: ProductState = initialState, action: ProductActio
                 }
             };
         }
+        case ProductActionTypes.LOAD_SUCCESS:
+            return {
+                ...state,
+                products: action.payload,
+                error: '' // if no error then error property is empty string
+            };
+
+        case ProductActionTypes.LOAD_FAIL:
+            return {
+                ...state,
+                products: [], // if we have error then products array is empty
+                error: action.payload
+            };
 
         default: {
             return state;

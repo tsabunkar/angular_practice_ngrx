@@ -20,6 +20,7 @@ import { StoreModule } from '@ngrx/store';
 import { reducer } from './products/state/product.reducer';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from 'src/environments/environment.prod';
+import { EffectsModule } from '@ngrx/effects';
 
 @NgModule({
   imports: [
@@ -29,6 +30,7 @@ import { environment } from 'src/environments/environment.prod';
     UserModule,
     AppRoutingModule,
     StoreModule.forRoot({}), // initialzing empty store, bcoz we still don't have Root store module
+    EffectsModule.forRoot([]), // initializing the effects
     // !Initialize devtools for redux
     StoreDevtoolsModule.instrument({
       name: 'Acme Product Mangament Project', // debugging this application APM Demo App DevTools
