@@ -13,6 +13,12 @@ export enum ProductActionTypes {
     UPDATE_PRODUCT = '[Product] update the product',
     UPDATE_PRODUCT_SUCCESS = '[Product] updated the product successfully',
     UPDATE_PRODUCT_FAIL = '[Product] failed to update the product',
+    CREATE_PRODUCT = '[Product] create a new product',
+    CREATE_PRODUCT_SUCCESS = '[Product] create the product successfully',
+    CREATE_PRODUCT_FAIL = '[Product] failed to create the product',
+    DELETE_PRODUCT = '[Product] delete a selected product',
+    DELETE_PRODUCT_SUCCESS = '[Product] deleted the product successfully',
+    DELETE_PRODUCT_FAIL = '[Product] failed to delete the product'
 }
 
 // !another way of defining the constants
@@ -72,6 +78,37 @@ export class UpdateProductFailAction implements Action {
     constructor(public payload: string) { }
 }
 
+export class CreateProductAction implements Action {
+    readonly type = ProductActionTypes.CREATE_PRODUCT;
+
+    constructor(public payload: Product) { }
+}
+export class CreateProductSuccessAction implements Action {
+    readonly type = ProductActionTypes.CREATE_PRODUCT_SUCCESS;
+
+    constructor(public payload: Product) { }
+}
+export class CreateProductFailAction implements Action {
+    readonly type = ProductActionTypes.CREATE_PRODUCT_FAIL;
+
+    constructor(public payload: string) { }
+}
+export class DeleteProductAction implements Action {
+    readonly type = ProductActionTypes.DELETE_PRODUCT;
+
+    constructor(public payload: number) { }
+}
+export class DeleteProductSuccessAction implements Action {
+    readonly type = ProductActionTypes.DELETE_PRODUCT_SUCCESS;
+
+    constructor(public payload: number) { }
+}
+export class DeleteProductFailAction implements Action {
+    readonly type = ProductActionTypes.DELETE_PRODUCT_FAIL;
+
+    constructor(public payload: string) { }
+}
+
 
 
 // ! Step-3) Defining a Union Type for action creator
@@ -84,6 +121,12 @@ export type ProductActions = ToggleProductCodeAction
     | LoadSuccessAction
     | UpdateProductAction
     | UpdateProductSuccessAction
-    | UpdateProductFailAction;
+    | UpdateProductFailAction
+    | CreateProductAction
+    | CreateProductSuccessAction
+    | CreateProductFailAction
+    | DeleteProductAction
+    | DeleteProductSuccessAction
+    | DeleteProductFailAction;
 
 

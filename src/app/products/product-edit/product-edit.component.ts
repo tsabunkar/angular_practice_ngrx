@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Subscription } from 'rxjs';
+import { Subscription, Observable, of } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -12,6 +12,7 @@ import { NumberValidators } from '../../shared/number.validator';
 import { Store, select } from '@ngrx/store';
 import * as  fromProduct from '../state/product.reducer';
 import * as productAction from './../state/product.action';
+import { takeWhile } from 'rxjs/operators';
 @Component({
   selector: 'pm-product-edit',
   templateUrl: './product-edit.component.html',
@@ -19,11 +20,13 @@ import * as productAction from './../state/product.action';
 })
 export class ProductEditComponent implements OnInit, OnDestroy {
   pageTitle = 'Product Edit';
-  errorMessage = '';
+  // errorMessage = '';
+  errorMessage$: Observable<string>;
   productForm: FormGroup;
 
   product: Product | null;
   sub: Subscription;
+  componentActive = true;
 
   // Use with the generic validation message class
   displayMessage: { [key: string]: string } = {};
@@ -71,10 +74,16 @@ export class ProductEditComponent implements OnInit, OnDestroy {
          selectedProduct => this.displayProduct(selectedProduct)
        ); */
     // !using NgRx concept
-    this.store.pipe(select(fromProduct.getCurrentProductPropertyFromFeatureSliceOfStateObject))
+    this.store.pipe(
+      select(fromProduct.getCurrentProductPropertyFromFeatureSliceOfStateObject),
+      takeWhile(() => this.componentActive)
+    )
       .subscribe(
         currentProduct => this.displayProduct(currentProduct)
       );
+
+    // Watch for changes to the error message
+    this.errorMessage$ = this.store.pipe(select(fromProduct.getErrorPropertyFromFeatureSliceOfStateObject));
 
     // Watch for value changes
     this.productForm.valueChanges.subscribe(
@@ -84,6 +93,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // this.sub.unsubscribe();
+    this.componentActive = false;
   }
 
   // Also validate on blur
@@ -137,13 +147,25 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       }
     } */
   // !using NgRx concept
+  /*  deleteProduct(): void {
+     if (this.product && this.product.id) {
+       if (confirm(`Really delete the product: ${this.product.productName}?`)) {
+         this.productService.deleteProduct(this.product.id).subscribe(
+           () => this.store.dispatch(new productAction.ClearCurrentProductAction()),
+           (err: any) => this.errorMessage = err.error
+         );
+       }
+     } else {
+       // No need to delete, it was never saved
+       this.store.dispatch(new productAction.ClearCurrentProductAction());
+     }
+   } */
+
+  // !using Effects to CRUD operation (Delete)
   deleteProduct(): void {
     if (this.product && this.product.id) {
       if (confirm(`Really delete the product: ${this.product.productName}?`)) {
-        this.productService.deleteProduct(this.product.id).subscribe(
-          () => this.store.dispatch(new productAction.ClearCurrentProductAction()),
-          (err: any) => this.errorMessage = err.error
-        );
+        this.store.dispatch(new productAction.DeleteProductAction(this.product.id));
       }
     } else {
       // No need to delete, it was never saved
@@ -211,17 +233,14 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         // This ensures values not on the form, such as the Id, are retained
         const p = { ...this.product, ...this.productForm.value };
 
-        if (p.id === 0) {
-          this.productService.createProduct(p).subscribe(
-            product => this.store.dispatch(new productAction.SetCurrentProductAction(product)),
-            (err: any) => this.errorMessage = err.error
-          );
+        if (p.id === 0) {// for create using the concept of NgRx effects
+          this.store.dispatch(new productAction.CreateProductAction(p));
         } else { // for update using the concept of NgRx effects
           this.store.dispatch(new productAction.UpdateProductAction(p));
         }
       }
     } else {
-      this.errorMessage = 'Please correct the validation errors.';
+      this.errorMessage$ = of('Please correct the validation errors.');
     }
   }
 

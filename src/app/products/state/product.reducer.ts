@@ -194,6 +194,34 @@ export function reducer(state: ProductState = initialState, action: ProductActio
                 error: action.payload
             };
 
+        case ProductActionTypes.CREATE_PRODUCT_SUCCESS:
+            return {
+                ...state,
+                products: [...state.products, action.payload],
+                currentProductId: action.payload.id,
+                error: ''
+            };
+
+        case ProductActionTypes.CREATE_PRODUCT_FAIL:
+            return {
+                ...state,
+                error: action.payload
+            };
+
+        case ProductActionTypes.DELETE_PRODUCT_SUCCESS:
+            return {
+                ...state,
+                products: state.products.filter(prod => prod.id !== action.payload), // apart from deleted product show all the products
+                currentProductId: null,
+                error: ''
+            };
+
+        case ProductActionTypes.DELETE_PRODUCT_FAIL:
+            return {
+                ...state,
+                error: action.payload
+            };
+
         default: {
             return state;
         }
